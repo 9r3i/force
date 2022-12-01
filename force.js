@@ -4,16 +4,21 @@
  * authored by 9r3i
  * https://github.com/9r3i
  * started at november 12th 2022
+ * continued at december 1st 2022 - v1.2.0 - cache control
  */
 ;const Force=function(){
-this.version='1.1.0'; /* release version */
+this.version='1.2.0'; /* release version */
 this.host=null; /* force stream host */
 this.pkey=null; /* force privilege key */
 this.loadedApp=null; /* current loaded app */
-const ForceObject=this; /* constant to this object */
+const _Force=this; /* constant to this object */
 /* ============ apps requires @get, 2 others ============ */
 /**
  * app -- return object
+ * @parameters
+ *   ns     = string of app namespace (required)
+ *   root   = string of app root; default: apps (local)
+ *   config = mixed of config for inner app (optional)
  * @requires
  *   this.get
  *   this.alert
@@ -21,25 +26,38 @@ const ForceObject=this; /* constant to this object */
  * @methods
  *   init = async function
  */
-this.app=function(ns,root){
+this.app=function(ns,root,config){
+  config=typeof config==='object'&&config!==null?config:{};
   this.loaderCSS();
   this.dialogCSS();
   return {
     root:typeof root==='string'?root:'apps',
     namespace:ns,
+    config:config,
     Force:this,
     init:async function(){
       var ns=this.namespace,
       root=this.root,
       path=`${root}/${ns}/${ns}.js`,
-      script=await this.Force.get(path);
-      if(typeof script!=='string'
-        ||/^error/i.test(script)){
-        await this.Force.alert('Error: Invalid app "'
-          +ns+'" file.');
-        return false;
+      vpath=`apps/${ns}/${ns}.js`,
+      script=this.Force.virtualFile(vpath);
+      if(!script){
+        script=await this.Force.get(path);
+        if(typeof script!=='string'
+          ||/^error/i.test(script)){
+          await this.Force.alert('Error: Failed to load "'
+            +ns+'" app file.');
+          return false;
+        }
+        this.Force.virtualFile(vpath,script);
+      }else{
+        var _app=this;
+        this.Force.get(path).then(r=>{
+          _app.Force.virtualFile(vpath,r);
+        });
       }
-      this.Force.loadScript(script,ns);
+      this.Force.virtualFileClearance();
+      this.Force.loadScript(script,'force-app-'+ns);
       if(!window.hasOwnProperty(ns)
         ||typeof window[ns]!=='function'){
         await this.Force.alert('Error: Invalid app "'
@@ -64,14 +82,16 @@ this.app=function(ns,root){
  *   this.loadScript
  *   this.loadStyleFile
  * @methods
- *   init     = function
- *   prepare  = async function
- *   register = function
+ *   init       = function
+ *   prepare    = async function
+ *   register   = function
+ *   loadScript = function
  */
 this.plugin={
   root:'plugins',
   plug:[],
   param:{},
+  hosts:{},
   Force:this,
   /* initialize all plugins */
   init:function(){
@@ -92,16 +112,25 @@ this.plugin={
     cb({loaded:loaded,total:this.plug.length});
     for(var ns of this.plug){
       loaded++;
-      var path=`${root}/${ns}/${ns}.js`,
-      pathCSS=`${root}/${ns}/${ns}.css`;
+      var _plug=this,
+      host=this.hosts.hasOwnProperty(ns)?this.hosts[ns]:root;
+      path=`${host}/${ns}/${ns}.js`,
+      vpath=`plugins/${ns}/${ns}.js`,
+      pathCSS=`${host}/${ns}/${ns}.css`,
+      script=this.Force.virtualFile(vpath);
       this.Force.loadStyleFile(pathCSS);
-      var script=await this.Force.get(path);
-      if(typeof script!=='string'
-        ||/^error/i.test(script)){
-        await this.Force.alert('Error: Invalid plugin "'+ns+'".');
-        continue;
+      if(!script){
+        script=await this.Force.get(path);
+        if(typeof script!=='string'
+          ||/^error/i.test(script)){
+          await this.Force.alert('Error: Invalid plugin "'+ns+'".');
+          continue;
+        }
+        this.Force.virtualFile(vpath,script);
+      }else{
+        this.loadScript(path,vpath,ns);
       }
-      this.Force.loadScript(script,ns);
+      this.Force.loadScript(script,'force-plugin-'+ns);
       if(!window.hasOwnProperty(ns)
         ||typeof window[ns]!=='function'){
         await this.Force.alert('Error: Invalid plugin "'+ns+'".');
@@ -111,18 +140,32 @@ this.plugin={
       cb({loaded:loaded,total:this.plug.length});
     }return this;
   },
-  /* plugin register -- namespace and parameter */
-  register:function(ns,pr){
+  /* load script at background */
+  loadScript:function(path,vpath,ns){
+    var _plug=this;
+    this.Force.get(path).then(r=>{
+      _plug.Force.virtualFile(vpath,r);
+      _plug.Force.loadScript(r,'force-plugin-'+ns);
+    });
+  },
+  /* plugin register -- namespace, parameter and host */
+  register:function(ns,pr,host){
     if(typeof ns==='string'
       &&/^[a-zA-Z][a-zA-Z0-9_]+$/.test(ns)
       &&this.plug.indexOf(ns)<0){
       this.plug.push(ns);
       this.param[ns]=typeof pr==='undefined'?null:pr;
+      if(typeof host==='string'){
+        this.hosts[ns]=host;
+      }
     }else if(Array.isArray(ns)){
       for(var nx of ns){
         if(Array.isArray(nx)&&nx.length>0){
           this.plug.push(nx[0]);
           this.param[nx[0]]=nx.length>1?nx[1]:null;
+          if(nx.length>2&&typeof nx[2]==='string'){
+            this.hosts[nx[0]]=nx[2];
+          }
         }else if(typeof nx==='string'){
           this.plug.push(nx);
           this.param[nx]=null;
@@ -144,13 +187,13 @@ this.plugin={
  * 
  * @usage:
  * async function(){
- *   var data=await ForceObject.get(url,upload,download);
+ *   var data=await _Force.get(url,upload,download);
  *   return data;
  * }
  */
 this.get=function(url,upl,dnl,dta){
   return new Promise(resolve=>{
-    ForceObject.post('ForceObject.get',r=>{
+    _Force.post('_Force.get',r=>{
       resolve(r);
     },dta,{
       method:'GET',
@@ -177,13 +220,13 @@ this.get=function(url,upl,dnl,dta){
  * 
  * @usage:
  * async function(){
- *   var data=await ForceObject.fetch(method,data,config);
+ *   var data=await _Force.fetch(method,data,config);
  *   return data;
  * }
  */
 this.fetch=function(mt,dt,cf){
   return new Promise(resolve=>{
-    ForceObject.post(mt,r=>{
+    _Force.post(mt,r=>{
       resolve(r);
     },dt,cf);
   });
@@ -246,13 +289,13 @@ this.post=function(mt,cb,dt,cf){
  * -----
  * @usage:
  * async function(){
- *   return await ForceObject.alert('OK');
+ *   return await _Force.alert('OK');
  * }
  * -----
  */
 this.alert=function(text){
   return new Promise(resolve=>{
-    ForceObject.dialogAlert(text,e=>{
+    _Force.dialogAlert(text,e=>{
       resolve(e);
     });
   });
@@ -267,13 +310,13 @@ this.alert=function(text){
  * -----
  * @usage:
  * async function(){
- *   return await ForceObject.confirm('Are you sure?');
+ *   return await _Force.confirm('Are you sure?');
  * }
  * -----
  */
 this.confirm=function(text){
   return new Promise(resolve=>{
-    ForceObject.dialogConfirm((e,d)=>{
+    _Force.dialogConfirm((e,d)=>{
       resolve(e);
     },text);
   });
@@ -289,13 +332,13 @@ this.confirm=function(text){
  * -----
  * @usage:
  * async function(){
- *   return await ForceObject.prompt('Insert Name','Your Name');
+ *   return await _Force.prompt('Insert Name','Your Name');
  * }
  * -----
  */
 this.prompt=function(text,def){
   return new Promise(resolve=>{
-    ForceObject.dialogPrompt((e,d)=>{
+    _Force.dialogPrompt((e,d)=>{
       resolve(e);
     },text,def);
   });
@@ -323,6 +366,21 @@ this.dialogPrompt=function(cb,text,def,type,holder){
     .addInput(cb,def,type,holder).show();
 };
 /* ============ basic requires stand-alone ============ */
+/* virtual file clearance -- 3 fingers gesture */
+this.virtualFileClearance=function(){
+  window.VIRTUAL_FILE_CLEARANCE=false;
+  window.ontouchmove=async function(e){
+    if(e.changedTouches.length>=0x03
+      &&!window.VIRTUAL_FILE_CLEARANCE){
+      window.VIRTUAL_FILE_CLEARANCE=true;
+      var text='Clear all Force cache?',
+      yes=await _Force.confirm(text);
+      window.VIRTUAL_FILE_CLEARANCE=false;
+      if(!yes){return false;}
+      return _Force.virtual(false);
+    }
+  };
+};
 /**
  * dialog -- november 10th 2022
  * @requires: 
@@ -339,16 +397,16 @@ this.dialogPrompt=function(cb,text,def,type,holder){
 Usage confirm:
   var cp=this.dialog('Delete this file?',false,'Confirm','No')
     .addButton(function(e,d){
-      ForceObject.splash(d.answer);
+      _Force.splash(d.answer);
     },'Yes','red').show();
-  ForceObject.splash(cp.answer); // has to be wait
+  _Force.splash(cp.answer); // has to be wait
   
 Usage prompt:
   var pr=this.dialog('Insert your text!',true,'Prompt','Cancel')
     .addInput(function(e,d){
-      ForceObject.splash(e);
+      _Force.splash(e);
     },'Default Value','text','Insert Text').show();
-  ForceObject.splash(cp.input.value); // has to be wait
+  _Force.splash(cp.input.value); // has to be wait
 */
 this.dialog=function(text,hold,title,oktext,bgtap,cb){
   title=typeof title==='string'?title:'Alert';
@@ -381,6 +439,7 @@ this.dialog=function(text,hold,title,oktext,bgtap,cb){
   },[dbo]),
   dbg=this.buildElement('div',null,{
     'class':'dialog-background',
+    'id':'dialog-background',
   }),
   d=this.buildElement('div',null,{
     'class':'dialog',
@@ -685,8 +744,32 @@ this.onFunctionReady=function(fn,cb,cr){
     return cb(res);
   }cr++;
   return setTimeout(function(){
-    ForceObject.onFunctionReady(fn,cb,cr);
+    _Force.onFunctionReady(fn,cb,cr);
   },0x64);
+};
+/* storage for virtual files
+ * @parameters
+ *   f = string of filename, or false to clear all virtual files
+ *   c = string of content, or false to delete
+ */
+this.virtualFile=function(f,c){
+  const p='force/virtual/',
+  r=/^force\/virtual\//,
+  k=p+''+f.toString();
+  if(f===false){
+    for(var i=0;i<localStorage.length;i++){
+      var v=localStorage.key(i);
+      if(v.match(r)){
+        localStorage.removeItem(v);
+      }
+    }return true;
+  }else if(typeof c==='string'){
+    localStorage.setItem(k,c);
+    return true;
+  }else if(typeof c===false){
+    localStorage.removeItem(k);
+    return true;
+  }return localStorage.getItem(k);
 };
 /* is script loaded
  * @parameters:
