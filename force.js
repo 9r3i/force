@@ -7,7 +7,7 @@
  * continued at december 1st 2022 - v1.2.0 - cache control
  */
 ;const Force=function(){
-this.version='1.2.1'; /* release version */
+this.version='1.2.2'; /* release version */
 this.host=null; /* force stream host */
 this.pkey=null; /* force privilege key */
 this.loadedApp=null; /* current loaded app */
@@ -377,7 +377,7 @@ this.virtualFileClearance=function(){
       yes=await _Force.confirm(text);
       window.VIRTUAL_FILE_CLEARANCE=false;
       if(!yes){return false;}
-      return _Force.virtual(false);
+      return _Force.virtualFile(false);
     }
   };
 };
