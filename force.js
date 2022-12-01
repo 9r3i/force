@@ -7,7 +7,7 @@
  * continued at december 1st 2022 - v1.2.0 - cache control
  */
 ;const Force=function(){
-this.version='1.2.0'; /* release version */
+this.version='1.2.1'; /* release version */
 this.host=null; /* force stream host */
 this.pkey=null; /* force privilege key */
 this.loadedApp=null; /* current loaded app */
@@ -714,10 +714,10 @@ this.stream=function(url,cb,er,dt,hd,ul,dl,mt,ud4){
       catch(e){var res=xmlhttp.responseText;}
       return cb(res);
     }else if(xmlhttp.readyState===4){
-      if(xmlhttp.status===0){return er('Error: No internet connection.');}
-      return er('Error: '+xmlhttp.status+' '+xmlhttp.statusText);
+      return er('Error: '+xmlhttp.status+' - '
+        +(xmlhttp.status===0?'No Connection':xmlhttp.statusText));
     }else if(xmlhttp.readyState<4){
-      return ud4('Mobile::stream--> '+xmlhttp.readyState+' '+xmlhttp.status+' '+xmlhttp.statusText);
+      return ud4('Force::stream--> '+xmlhttp.readyState+' '+xmlhttp.status+' '+xmlhttp.statusText);
     }return er('Error: '+xmlhttp.status+' '+xmlhttp.statusText);
   };
   /* set callback for upload and download */
@@ -872,6 +872,7 @@ this.buildElement=function(tag,text,attr,children,html,content){
     }return false;
   };
   div.remove=function(){
+    if(!this.parentNode){return;}
     this.parentNode.removeChild(this);
   };
   if(typeof text==='string'){
