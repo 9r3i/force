@@ -7,7 +7,7 @@
  * continued at december 1st 2022 - v1.2.0 - cache control
  */
 ;const Force=function(){
-this.version='1.2.4'; /* release version */
+this.version='1.2.5'; /* release version */
 this.host=null; /* force stream host */
 this.pkey=null; /* force privilege key */
 this.loadedApp=null; /* current loaded app */
@@ -373,10 +373,11 @@ this.virtualFileClearance=function(){
     if(e.changedTouches.length>=0x03
       &&!window.VIRTUAL_FILE_CLEARANCE){
       window.VIRTUAL_FILE_CLEARANCE=true;
-      var text='Clear all Force cache?',
+      var text='Clear all Force caches?',
       yes=await _Force.confirm(text);
       window.VIRTUAL_FILE_CLEARANCE=false;
       if(!yes){return false;}
+      _Force.splash('All caches has been cleared.');
       return _Force.virtualFile(false);
     }
   };
@@ -699,9 +700,7 @@ this.stream=function(url,cb,er,dt,hd,ul,dl,mt,ud4){
   xmlhttp.open(mt,url,true);
   /* build urlencoded form data */
   if(typeof dt==='object'&&dt!==null){
-    if(typeof dt.append==='function'){
-      xmlhttp.setRequestHeader("Content-type","multipart/form-data");
-    }else{
+    if(typeof dt.append!=='function'){
       xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
       dt=this.buildQuery(dt);
     }
@@ -710,6 +709,9 @@ this.stream=function(url,cb,er,dt,hd,ul,dl,mt,ud4){
   if(typeof hd=='object'&&hd!=null){
     for(var i in hd){xmlhttp.setRequestHeader(i,hd[i]);}
   }
+  /* set callback for upload and download */
+  xmlhttp.upload.onprogress=ul;
+  xmlhttp.addEventListener("progress",dl,false);
   /* xhr ready state change */
   xmlhttp.onreadystatechange=function(e){
     if(xmlhttp.readyState===4&&xmlhttp.status===200
@@ -724,9 +726,6 @@ this.stream=function(url,cb,er,dt,hd,ul,dl,mt,ud4){
       return ud4('Force::stream--> '+xmlhttp.readyState+' '+xmlhttp.status+' '+xmlhttp.statusText);
     }return er('Error: '+xmlhttp.status+' '+xmlhttp.statusText);
   };
-  /* set callback for upload and download */
-  xmlhttp.upload.onprogress=ul;
-  xmlhttp.addEventListener("progress",dl,false);
   /* send XHR */
   xmlhttp.send(dt);
 };
