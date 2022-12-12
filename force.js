@@ -7,7 +7,7 @@
  * continued at december 1st 2022 - v1.2.0 - cache control
  */
 ;const Force=function(){
-this.version='1.2.5'; /* release version */
+this.version='1.2.6'; /* release version */
 this.host=null; /* force stream host */
 this.pkey=null; /* force privilege key */
 this.loadedApp=null; /* current loaded app */
@@ -869,14 +869,17 @@ this.clearElement=function(el){
 this.buildElement=function(tag,text,attr,children,html,content){
   var div=document.createElement(typeof tag==='string'?tag:'div');
   div.appendTo=function(el){
-    if(typeof el.appendChild==='function'){
+    if(typeof el==='object'&&el!==null
+      &&typeof el.appendChild==='function'){
       el.appendChild(this);
       return true;
     }return false;
   };
   div.remove=function(){
-    if(!this.parentNode){return;}
-    this.parentNode.removeChild(this);
+    if(!this.parentNode
+      ||typeof this.parentNode.removeChild!=='function'){
+      return;
+    }this.parentNode.removeChild(this);
   };
   if(typeof text==='string'){
     div.innerText=text;
@@ -889,7 +892,8 @@ this.buildElement=function(tag,text,attr,children,html,content){
   if(Array.isArray(children)){
     for(var i=0;i<children.length;i++){
       if(typeof children[i]==='object'
-        &&children[i]!==null){
+        &&children[i]!==null
+        &&typeof children[i].appendChild==='function'){
         div.appendChild(children[i]);
       }
     }
