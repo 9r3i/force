@@ -7,7 +7,7 @@
  * continued at december 1st 2022 - v1.2.0 - cache control
  */
 ;const Force=function(){
-this.version='1.2.3'; /* release version */
+this.version='1.2.4'; /* release version */
 this.host=null; /* force stream host */
 this.pkey=null; /* force privilege key */
 this.loadedApp=null; /* current loaded app */
@@ -699,8 +699,7 @@ this.stream=function(url,cb,er,dt,hd,ul,dl,mt,ud4){
   xmlhttp.open(mt,url,true);
   /* build urlencoded form data */
   if(typeof dt==='object'&&dt!==null){
-    if(dt.hasOwnProperty('append')
-      &&typeof dt.append==='function'){
+    if(typeof dt.append==='function'){
       xmlhttp.setRequestHeader("Content-type","multipart/form-data");
     }else{
       xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
