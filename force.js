@@ -5,9 +5,14 @@
  * https://github.com/9r3i
  * started at november 12th 2022
  * continued at december 1st 2022 - v1.2.0 - cache control
+ * continued at december 13th 2022 - v1.3.0 - cache age; 1 day
  */
 ;const Force=function(){
-this.version='1.2.6'; /* release version */
+/* release version */
+Object.defineProperty(this,'version',{
+  value:'1.3.0',
+  writable:false,
+});
 this.host=null; /* force stream host */
 this.pkey=null; /* force privilege key */
 this.loadedApp=null; /* current loaded app */
@@ -50,7 +55,7 @@ this.app=function(ns,root,config){
           return false;
         }
         this.Force.virtualFile(vpath,script);
-      }else{
+      }else if(this.cacheExpired()){
         var _app=this;
         this.Force.get(path).then(r=>{
           _app.Force.virtualFile(vpath,r);
@@ -64,12 +69,34 @@ this.app=function(ns,root,config){
           +ns+'" script.');
         return false;
       }
+      this.Force.plugin.config=this.config;
       const napp=new window[ns](this);
       if(napp.hasOwnProperty('init')
         &&typeof napp.init==='function'){
         this.Force.loadedApp=napp;
         return napp.init();
       }return napp;
+    },
+    cacheExpired:function(){
+      var tage='cache/age.txt',
+      cage=86400000, /* 1 day */
+      vage=this.Force.virtualFile(tage),
+      nage=(new Date).getTime();
+      if(this.config.hasOwnProperty('force')
+        &&this.config.force.hasOwnProperty('cache')
+        &&this.config.force.cache.hasOwnProperty('age')){
+        cage=parseInt(this.config.force.cache.age,10);
+      }
+      var mage=nage+cage;
+      if(!vage){
+        vage=this.Force.virtualFile(tage,mage.toString());
+        return true;
+      }
+      var age=parseInt(vage,10);
+      if(age<nage){
+        vage=this.Force.virtualFile(tage,mage.toString());
+        return true;
+      }return false;
     },
   };
 };
@@ -93,6 +120,7 @@ this.plugin={
   param:{},
   hosts:{},
   Force:this,
+  config:{},
   /* initialize all plugins */
   init:function(){
     for(var ns of this.plug){
@@ -117,20 +145,32 @@ this.plugin={
       path=`${host}/${ns}/${ns}.js`,
       vpath=`plugins/${ns}/${ns}.js`,
       pathCSS=`${host}/${ns}/${ns}.css`,
-      script=this.Force.virtualFile(vpath);
-      this.Force.loadStyleFile(pathCSS);
+      vpathCSS=`plugins/${ns}/${ns}.css`,
+      script=this.Force.virtualFile(vpath),
+      style=this.Force.virtualFile(vpathCSS);
       if(!script){
         script=await this.Force.get(path);
+        style=await this.Force.get(pathCSS);
         if(typeof script!=='string'
           ||/^error/i.test(script)){
           await this.Force.alert('Error: Invalid plugin "'+ns+'".');
           continue;
         }
         this.Force.virtualFile(vpath,script);
-      }else{
-        this.loadScript(path,vpath,ns);
+        this.Force.virtualFile(vpathCSS,style);
+      }else if(this.cacheExpired()){
+        var _plug=this;
+        this.Force.get(path).then(r=>{
+          _plug.Force.virtualFile(vpath,r);
+          _plug.Force.loadScript(r,'force-plugin-'+ns);
+        });
+        this.Force.get(pathCSS).then(r=>{
+          _plug.Force.virtualFile(vpathCSS,r);
+          _plug.Force.loadStyle(r,'force-plugin-style-'+ns);
+        });
       }
       this.Force.loadScript(script,'force-plugin-'+ns);
+      this.Force.loadStyle(style,'force-plugin-style-'+ns);
       if(!window.hasOwnProperty(ns)
         ||typeof window[ns]!=='function'){
         await this.Force.alert('Error: Invalid plugin "'+ns+'".');
@@ -140,13 +180,26 @@ this.plugin={
       cb({loaded:loaded,total:this.plug.length});
     }return this;
   },
-  /* load script at background */
-  loadScript:function(path,vpath,ns){
-    var _plug=this;
-    this.Force.get(path).then(r=>{
-      _plug.Force.virtualFile(vpath,r);
-      _plug.Force.loadScript(r,'force-plugin-'+ns);
-    });
+  cacheExpired:function(){
+    var tage='cache/age.txt',
+    cage=86400000, /* 1 day */
+    vage=this.Force.virtualFile(tage),
+    nage=(new Date).getTime(),
+    mage=nage+cage;
+    if(this.config.hasOwnProperty('force')
+      &&this.config.force.hasOwnProperty('cache')
+      &&this.config.force.cache.hasOwnProperty('age')){
+      cage=parseInt(this.config.force.cache.age,10);
+    }
+    if(!vage){
+      vage=this.Force.virtualFile(tage,mage.toString());
+      return true;
+    }
+    var age=parseInt(vage,10);
+    if(age<nage){
+      vage=this.Force.virtualFile(tage,mage.toString());
+      return true;
+    }return false;
   },
   /* plugin register -- namespace, parameter and host */
   register:function(ns,pr,host){
