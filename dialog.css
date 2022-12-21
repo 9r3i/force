@@ -1,254 +1,259 @@
-.dialog{
-  transition:all 0.3s ease 0s !important;
-  width:270px !important;
-  height:auto !important;
-  max-height:270px !important;
-  margin:0px !important;
-  padding:0px !important;
-  background-color:#fff !important;
-  display:block !important;
-  position:fixed !important;
-  z-index:99999 !important;
-  top:-100vh !important;
-  left:calc(50vw - 135px) !important;
-  box-shadow:0px 0px 15px #999 !important;
-  border:0px none !important;
-  border-radius:10px !important;
-  overflow:hidden !important;
+.force-dialog{
+  transition:all 0.3s ease 0s;
+  width:270px;
+  height:auto;
+  max-height:270px;
+  margin:0px;
+  padding:0px;
+  background-color:#fff;
+  display:block;
+  position:fixed;
+  z-index:99999;
+  top:-100vh;
+  left:calc(50vw - 135px);
+  box-shadow:0px 0px 15px #999;
+  border:0px none;
+  border-radius:10px;
+  overflow:hidden;
+  font-family:arialnarrow,system-ui,monospace;
 }
-.dialog-show{
-  top:calc(50vh - 135px) !important;
+.force-dialog-show{
+  top:calc(50vh - 135px);
 }
-.dialog-background{
-  transition:all 0.5s ease 0s !important;
-  width:100vw !important;
-  height:100vh !important;
-  margin:0px !important;
-  padding:0px !important;
-  background-color:#fff !important;
-  opacity:0.5 !important;
-  display:block !important;
-  position:fixed !important;
-  z-index:99998 !important;
-  top:0px !important;
-  left:0px !important;
-  right:0px !important;
-  bottom:0px !important;
-  border:0px none !important;
-  overflow:hidden !important;
+.force-dialog-background{
+  transition:all 0.5s ease 0s;
+  width:100vw;
+  height:100vh;
+  margin:0px;
+  padding:0px;
+  background-color:#fff;
+  opacity:0.5;
+  display:block;
+  position:fixed;
+  z-index:99998;
+  top:0px;
+  left:0px;
+  right:0px;
+  bottom:0px;
+  border:0px none;
+  overflow:hidden;
 }
-.dialog-title{
-  font-weight:bold !important;
-  font-size:20px !important;
-  color:#555 !important;
-  border-bottom:1px solid #ddd !important;
-  box-shadow:0px 1px 5px #ddd !important;
-  margin:0px !important;
-  padding:0px !important;
-  text-align:center !important;
-  height:50px !important;
-  line-height:50px !important;
-  overflow:hidden !important;
-  white-space:pre-wrap !important;
+.force-dialog-title{
+  font-weight:bold;
+  font-size:20px;
+  color:#555;
+  border-bottom:1px solid #ddd;
+  box-shadow:0px 1px 5px #ddd;
+  margin:0px;
+  padding:0px;
+  text-align:center;
+  height:50px;
+  line-height:50px;
+  overflow:hidden;
+  white-space:pre-wrap;
+  font-family:inherit,system-ui,monospace;
 }
-.dialog-title:before{
-  content:attr(data-text) !important;
+.force-dialog-title:before{
+  content:attr(data-text);
 }
-.dialog-text-out{
-  margin:0px !important;
-  padding:20px 10px !important;
-  overflow:hidden !important;
+.force-dialog-text-out{
+  margin:0px;
+  padding:20px 10px;
+  overflow:hidden;
 }
-.dialog-text{
-  font-size:16px !important;
-  color:#555 !important;
-  margin:0px !important;
-  padding:0px !important;
-  overflow-x:hidden !important;
-  overflow-y:auto !important;
-  white-space:pre-wrap !important;
-  word-wrap:pre-wrap !important;
-  word-break:break-all !important;
-  height:auto !important;
-  max-height:113px !important;
-  text-align:center !important;
+.force-dialog-text{
+  font-size:16px;
+  color:#555;
+  margin:0px;
+  padding:0px;
+  overflow-x:hidden;
+  overflow-y:auto;
+  white-space:pre-wrap;
+  word-wrap:pre-wrap;
+  word-break:break-all;
+  height:auto;
+  max-height:113px;
+  text-align:center;
+  font-family:inherit,system-ui,monospace;
 }
-.dialog-text:before{
-  content:attr(data-text) !important;
+.force-dialog-text:before{
+  content:attr(data-text);
 }
-.dialog-text-left{
-  text-align:left !important;
+.force-dialog-text-left{
+  text-align:left;
 }
-.dialog-input{
-  width:calc(100% - 20px) !important;
-  font-size:16px !important;
-  border:1px solid #ddd !important;
-  border-radius:5px !important;
-  margin:10px 10px 10px !important;
-  padding:7px 13px !important;
-  color:#333 !important;
-  font-weight:normal !important;
-  background-color:#eed !important;
+.force-dialog-input{
+  width:calc(100% - 20px);
+  font-size:16px;
+  border:1px solid #ddd;
+  border-radius:5px;
+  margin:10px 10px 10px;
+  padding:7px 13px;
+  color:#333;
+  font-weight:normal;
+  background-color:#eed;
+  font-family:inherit,system-ui,monospace;
 }
-.dialog-button-out{
-  border-top:1px solid #ddd !important;
-  box-shadow:0px -1px 5px #ddd !important;
-  margin:0px !important;
-  padding:0px !important;
-  text-align:center !important;
-  height:65px !important;
-  line-height:60px !important !important;
-  overflow:hidden !important;
+.force-dialog-button-out{
+  border-top:1px solid #ddd;
+  box-shadow:0px -1px 5px #ddd;
+  margin:0px;
+  padding:0px;
+  text-align:center;
+  height:65px;
+  line-height:60px;
+  overflow:hidden;
 }
-.dialog-button:focus{
-  background-color:#ccb !important;
-  outline:none !important;
+.force-dialog-button:focus{
+  background-color:#ccb;
+  outline:none;
 }
-.dialog-button:hover{
-  background-color:#ddc !important;
+.force-dialog-button:hover{
+  background-color:#ddc;
 }
-.dialog-button:disabled{
-  background-color:#ddc !important;
-  color:#333 !important;
-  opacity:0.8 !important;
+.force-dialog-button:disabled{
+  background-color:#ddc;
+  color:#333;
+  opacity:0.8;
 }
-.dialog-button:before{
-  content:attr(data-text) !important;
+.force-dialog-button:before{
+  content:attr(data-text);
 }
-.dialog-button{
-  background-color:#eed !important;
-  padding:5px 11px !important;
-  border:0px none !important;
-  color:#333 !important;
-  font-size:16px !important;
-  margin:0px 0px !important;
-  border-radius:3px !important;
-  cursor:default !important;
-  transition:all 0.3s ease 0s !important;
-  box-shadow:1px 1px 3px #777 !important;
-  outline:none !important;
-  font-weight:bold !important;
+.force-dialog-button{
+  background-color:#eed;
+  padding:5px 11px;
+  border:0px none;
+  color:#333;
+  font-size:16px;
+  margin:0px 0px;
+  border-radius:3px;
+  cursor:default;
+  transition:all 0.3s ease 0s;
+  box-shadow:1px 1px 3px #777;
+  outline:none;
+  font-weight:bold;
+  font-family:inherit,system-ui,monospace;
 }
-.dialog-button-left{
-  margin-right:10px !important;
+.force-dialog-button-left{
+  margin-right:10px;
 }
-.dialog-button-blue:focus{
-  background-color:#159 !important;
+.force-dialog-button-blue:focus{
+  background-color:#159;
 }
-.dialog-button-blue:hover{
-  background-color:#26a !important;
+.force-dialog-button-blue:hover{
+  background-color:#26a;
 }
-.dialog-button-blue{
-  color:#fff !important;
-  background-color:#37b !important;
+.force-dialog-button-blue{
+  color:#fff;
+  background-color:#37b;
 }
-.dialog-button-soft-green:focus{
-  background-color:#591 !important;
+.force-dialog-button-soft-green:focus{
+  background-color:#591;
 }
-.dialog-button-soft-green:hover{
-  background-color:#6a2 !important;
+.force-dialog-button-soft-green:hover{
+  background-color:#6a2;
 }
-.dialog-button-soft-green{
-  color:#fff !important;
-  background-color:#7b3 !important;
+.force-dialog-button-soft-green{
+  color:#fff;
+  background-color:#7b3;
 }
-.dialog-button-orange:focus{
-  background-color:#951 !important;
+.force-dialog-button-orange:focus{
+  background-color:#951;
 }
-.dialog-button-orange:hover{
-  background-color:#a62 !important;
+.force-dialog-button-orange:hover{
+  background-color:#a62;
 }
-.dialog-button-orange{
-  color:#fff !important;
-  background-color:#b73 !important;
+.force-dialog-button-orange{
+  color:#fff;
+  background-color:#b73;
 }
-.dialog-button-red:focus{
-  background-color:#a11 !important;
+.force-dialog-button-red:focus{
+  background-color:#a11;
 }
-.dialog-button-red:hover{
-  background-color:#b22 !important;
+.force-dialog-button-red:hover{
+  background-color:#b22;
 }
-.dialog-button-red{
-  color:#fff !important;
-  background-color:#c33 !important;
+.force-dialog-button-red{
+  color:#fff;
+  background-color:#c33;
 }
-.dialog-button-yellow:focus{
-  background-color:#aa1 !important;
+.force-dialog-button-yellow:focus{
+  background-color:#aa1;
 }
-.dialog-button-yellow:hover{
-  background-color:#bb2 !important;
+.force-dialog-button-yellow:hover{
+  background-color:#bb2;
 }
-.dialog-button-yellow{
-  color:#fff !important;
-  background-color:#cc3 !important;
+.force-dialog-button-yellow{
+  color:#fff;
+  background-color:#cc3;
 }
-.dialog-button-purple:focus{
-  background-color:#519 !important;
+.force-dialog-button-purple:focus{
+  background-color:#519;
 }
-.dialog-button-purple:hover{
-  background-color:#62a !important;
+.force-dialog-button-purple:hover{
+  background-color:#62a;
 }
-.dialog-button-purple{
-  color:#fff !important;
-  background-color:#73b !important;
+.force-dialog-button-purple{
+  color:#fff;
+  background-color:#73b;
 }
-.dialog-button-pink:focus{
-  background-color:#915 !important;
+.force-dialog-button-pink:focus{
+  background-color:#915;
 }
-.dialog-button-pink:hover{
-  background-color:#a26 !important;
+.force-dialog-button-pink:hover{
+  background-color:#a26;
 }
-.dialog-button-pink{
-  color:#fff !important;
-  background-color:#b37 !important;
+.force-dialog-button-pink{
+  color:#fff;
+  background-color:#b37;
 }
-.dialog-button-tosca:focus{
-  background-color:#195 !important;
+.force-dialog-button-tosca:focus{
+  background-color:#195;
 }
-.dialog-button-tosca:hover{
-  background-color:#2a6 !important;
+.force-dialog-button-tosca:hover{
+  background-color:#2a6;
 }
-.dialog-button-tosca{
-  color:#fff !important;
-  background-color:#3b7 !important;
+.force-dialog-button-tosca{
+  color:#fff;
+  background-color:#3b7;
 }
-.dialog-button-violet:focus{
-  background-color:#a1a !important;
+.force-dialog-button-violet:focus{
+  background-color:#a1a;
 }
-.dialog-button-violet:hover{
-  background-color:#b2b !important;
+.force-dialog-button-violet:hover{
+  background-color:#b2b;
 }
-.dialog-button-violet{
-  color:#fff !important;
-  background-color:#c3c !important;
+.force-dialog-button-violet{
+  color:#fff;
+  background-color:#c3c;
 }
-.dialog-button-light-blue:focus{
-  background-color:#1aa !important;
+.force-dialog-button-light-blue:focus{
+  background-color:#1aa;
 }
-.dialog-button-light-blue:hover{
-  background-color:#2bb !important;
+.force-dialog-button-light-blue:hover{
+  background-color:#2bb;
 }
-.dialog-button-light-blue{
-  color:#fff !important;
-  background-color:#3cc !important;
+.force-dialog-button-light-blue{
+  color:#fff;
+  background-color:#3cc;
 }
-.dialog-button-dark-blue:focus{
-  background-color:#11a !important;
+.force-dialog-button-dark-blue:focus{
+  background-color:#11a;
 }
-.dialog-button-dark-blue:hover{
-  background-color:#22b !important;
+.force-dialog-button-dark-blue:hover{
+  background-color:#22b;
 }
-.dialog-button-dark-blue{
-  color:#fff !important;
-  background-color:#33c !important;
+.force-dialog-button-dark-blue{
+  color:#fff;
+  background-color:#33c;
 }
-.dialog-button-green:focus{
-  background-color:#1a1 !important;
+.force-dialog-button-green:focus{
+  background-color:#1a1;
 }
-.dialog-button-green:hover{
-  background-color:#2b2 !important;
+.force-dialog-button-green:hover{
+  background-color:#2b2;
 }
-.dialog-button-green{
-  color:#fff !important;
-  background-color:#3c3 !important;
+.force-dialog-button-green{
+  color:#fff;
+  background-color:#3c3;
 }
