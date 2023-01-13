@@ -14,7 +14,7 @@
 ;const Force=function(){
 /* release version */
 Object.defineProperty(this,'version',{
-  value:'1.4.1',
+  value:'1.5.0',
   writable:false,
 });
 this.host=null; /* force stream host */
@@ -45,7 +45,7 @@ this.app=function(ns,root,config){
     config:config,
     Force:this,
     init:async function(){
-      var ns=this.namespace,
+      let ns=this.namespace,
       root=this.root,
       path=`${root}/${ns}/${ns}.js`,
       vpath=`apps/${ns}/${ns}.js`,
@@ -60,7 +60,7 @@ this.app=function(ns,root,config){
         }
         this.Force.virtualFile(vpath,script);
       }else if(this.cacheExpired()){
-        var _app=this;
+        let _app=this;
         this.Force.get(path).then(r=>{
           _app.Force.virtualFile(vpath,r);
         });
@@ -82,7 +82,7 @@ this.app=function(ns,root,config){
       }return napp;
     },
     cacheExpired:function(){
-      var tage='cache/age.txt',
+      let tage='cache/age.txt',
       cage=86400000, /* 1 day */
       vage=this.Force.virtualFile(tage),
       nage=(new Date).getTime();
@@ -91,12 +91,12 @@ this.app=function(ns,root,config){
         &&this.config.force.cache.hasOwnProperty('age')){
         cage=parseInt(this.config.force.cache.age,10);
       }
-      var mage=nage+cage;
+      let mage=nage+cage;
       if(!vage){
         vage=this.Force.virtualFile(tage,mage.toString());
         return true;
       }
-      var age=parseInt(vage,10);
+      let age=parseInt(vage,10);
       if(age<nage){
         vage=this.Force.virtualFile(tage,mage.toString());
         return true;
@@ -127,8 +127,8 @@ this.plugin={
   config:{},
   /* initialize all plugins */
   init:function(){
-    for(var ns of this.plug){
-      var plug=new window[ns](this.param[ns]);
+    for(let ns of this.plug){
+      let plug=new window[ns](this.param[ns]);
       if(plug.hasOwnProperty('init')
         &&typeof plug.init==='function'){
         plug.init(this);
@@ -140,11 +140,11 @@ this.plugin={
     cb=typeof cb==='function'?cb:function(){};
     root=typeof root==='string'?root:this.root;
     this.root=root;
-    var loaded=0;
+    let loaded=0;
     cb({loaded:loaded,total:this.plug.length});
-    for(var ns of this.plug){
+    for(let ns of this.plug){
       loaded++;
-      var _plug=this,
+      let _plug=this,
       host=this.hosts.hasOwnProperty(ns)?this.hosts[ns]:root;
       path=`${host}/${ns}/${ns}.js`,
       vpath=`plugins/${ns}/${ns}.js`,
@@ -163,7 +163,7 @@ this.plugin={
         this.Force.virtualFile(vpath,script);
         this.Force.virtualFile(vpathCSS,style);
       }else if(this.cacheExpired()){
-        var _plug=this;
+        let _plug=this;
         this.Force.get(path).then(r=>{
           _plug.Force.virtualFile(vpath,r);
           _plug.Force.loadScript(r,'force-plugin-'+ns);
@@ -185,7 +185,7 @@ this.plugin={
     }return this;
   },
   cacheExpired:function(){
-    var tage='cache/age.txt',
+    let tage='cache/age.txt',
     cage=86400000, /* 1 day */
     vage=this.Force.virtualFile(tage),
     nage=(new Date).getTime(),
@@ -199,7 +199,7 @@ this.plugin={
       vage=this.Force.virtualFile(tage,mage.toString());
       return true;
     }
-    var age=parseInt(vage,10);
+    let age=parseInt(vage,10);
     if(age<nage){
       vage=this.Force.virtualFile(tage,mage.toString());
       return true;
@@ -216,7 +216,7 @@ this.plugin={
         this.hosts[ns]=host;
       }
     }else if(Array.isArray(ns)){
-      for(var nx of ns){
+      for(let nx of ns){
         if(Array.isArray(nx)&&nx.length>0){
           this.plug.push(nx[0]);
           this.param[nx[0]]=nx.length>1?nx[1]:null;
@@ -244,7 +244,7 @@ this.plugin={
  * 
  * @usage:
  * async function(){
- *   var data=await _Force.get(url,upload,download);
+ *   let data=await _Force.get(url,upload,download);
  *   return data;
  * }
  */
@@ -277,7 +277,7 @@ this.get=function(url,upl,dnl,dta){
  * 
  * @usage:
  * async function(){
- *   var data=await _Force.fetch(method,data,config);
+ *   let data=await _Force.fetch(method,data,config);
  *   return data;
  * }
  */
@@ -318,7 +318,7 @@ this.post=function(mt,cb,dt,cf){
   dt.method=mt;
   dt.token=(Math.floor((new Date).getTime()/0x3e8)+(0x5*0x3c))
     .toString(0x24);
-  var mtd=cf.hasOwnProperty('method')?cf.method:'POST',
+  let mtd=cf.hasOwnProperty('method')?cf.method:'POST',
       hdr=cf.hasOwnProperty('headers')?cf.headers:null,
       upl=cf.hasOwnProperty('upload')?cf.upload:null,
       dnl=cf.hasOwnProperty('download')?cf.download:null,
@@ -430,7 +430,7 @@ this.virtualFileClearance=function(){
     if(e.changedTouches.length>=0x03
       &&!window.VIRTUAL_FILE_CLEARANCE){
       window.VIRTUAL_FILE_CLEARANCE=true;
-      var text='Clear all Force caches?',
+      let text='Clear all Force caches?',
       yes=await _Force.confirm(text);
       window.VIRTUAL_FILE_CLEARANCE=false;
       if(!yes){return false;}
@@ -453,14 +453,14 @@ this.virtualFileClearance=function(){
  *   bgtap  = bool of background tap to close; default: false
 
 Usage confirm:
-  var cp=this.dialog('Delete this file?',false,'Confirm','No')
+  let cp=this.dialog('Delete this file?',false,'Confirm','No')
     .addButton(function(e,d){
       _Force.splash(d.answer);
     },'Yes','red').show();
   _Force.splash(cp.answer); // has to be wait
   
 Usage prompt:
-  var pr=this.dialog('Insert your text!',true,'Prompt','Cancel')
+  let pr=this.dialog('Insert your text!',true,'Prompt','Cancel')
     .addInput(function(e,d){
       _Force.splash(e);
     },'Default Value','text','Insert Text').show();
@@ -470,7 +470,7 @@ this.dialog=function(text,hold,title,oktext,bgtap,cb){
   title=typeof title==='string'?title:'Alert';
   oktext=typeof oktext==='string'?oktext:'OK';
   cb=typeof cb==='function'?cb:function(){};
-  var ptext=typeof text==='string'?text
+  let ptext=typeof text==='string'?text
     :typeof this.parseJSON==='function'
       ?this.parseJSON(text):JSON.stringify(text),
   old=document.getElementById('force-dialog'),
@@ -521,7 +521,7 @@ this.dialog=function(text,hold,title,oktext,bgtap,cb){
   d.close=function(){
     this.bg.remove();
     this.classList.remove('force-dialog-show');
-    var dialog=this;
+    let dialog=this;
     setTimeout(e=>{
       dialog.remove();
     },300);
@@ -530,7 +530,7 @@ this.dialog=function(text,hold,title,oktext,bgtap,cb){
   };
   d.show=function(){
     this.appendTo(document.body);
-    var dialog=this;
+    let dialog=this;
     setTimeout(e=>{
       dialog.classList.add('force-dialog-show');
       dialog.bg.appendTo(document.body);
@@ -551,7 +551,7 @@ this.dialog=function(text,hold,title,oktext,bgtap,cb){
     cb=typeof cb==='function'?cb:function(){};
     btext=typeof btext==='string'?btext:'Submit';
     clr=typeof clr==='string'?clr:'blue';
-    var nbut=this.buildElement('div',null,{
+    let nbut=this.buildElement('div',null,{
       'class':'force-dialog-button force-dialog-button-left force-dialog-button-'+clr,
       'data-text':btext,
     });
@@ -574,7 +574,7 @@ this.dialog=function(text,hold,title,oktext,bgtap,cb){
     def=typeof def==='string'?def:'';
     type=typeof type==='string'?type:'text';
     holder=typeof holder==='string'?holder:'';
-    var input=this.buildElement('input',null,{
+    let input=this.buildElement('input',null,{
       'class':'force-dialog-input',
       'type':type,
       'value':def,
@@ -604,7 +604,7 @@ this.dialog=function(text,hold,title,oktext,bgtap,cb){
 };
 /* splash message -- requires this.parseJSON */
 this.splash=function(str,t,limit){
-  var j=false,id='force-splash',
+  let j=false,id='force-splash',
       div=document.getElementById(id);
   if(typeof str!=='string'){
     str=this.parseJSON(str,limit);
@@ -629,12 +629,12 @@ this.splash=function(str,t,limit){
   }
   div.style.left='-100vw';
   document.body.appendChild(div);
-  var dw=div.offsetWidth/2;
+  let dw=div.offsetWidth/2;
   div.style.left='calc(50vw - '+dw+'px)';
   if(div){div.addEventListener('contextmenu',this.absorbEvent);}
-  var tt=t?(t*0x3e8):0xbb8;
+  let tt=t?(t*0x3e8):0xbb8;
   window.SPLASH_TIMEOUT=setTimeout(function(e){
-    var div=document.getElementById(id);
+    let div=document.getElementById(id);
     if(!div){return false;}
     div.style.top='-100vh';
     setTimeout(function(e){
@@ -653,24 +653,24 @@ this.splash=function(str,t,limit){
  *   pad   = int of first space per line; default: 2
  */
 this.parseJSON=function(obj,limit,space,pad){
-  var rtext='';  
+  let rtext='';  
   space=space?parseInt(space,10):0;
   limit=limit?parseInt(limit,10):1;
   pad=pad?parseInt(pad,10):2;
   if((typeof obj==='object'&&obj!==null)
     ||Array.isArray(obj)){
-    var start=Array.isArray(obj)?'[':'{',
+    let start=Array.isArray(obj)?'[':'{',
         end=Array.isArray(obj)?']':'}';
     if(space==0){
       rtext+=(' ').repeat(pad*space)+''+start+'\r\n';
     }
-    var len=this.objectLength(obj),counter=0;
-    for(var i in obj){
+    let len=this.objectLength(obj),counter=0;
+    for(let i in obj){
       counter++;
-      var comma=counter<len?',':'',e=obj[i],espace=space+2;
+      let comma=counter<len?',':'',e=obj[i],espace=space+2;
       if((typeof e==='object'&&e!==null)
         ||Array.isArray(e)){
-        var estart=Array.isArray(e)?'[':'{',
+        let estart=Array.isArray(e)?'[':'{',
             eend=Array.isArray(e)?']':'}',
             k=start==='{'?'"'+i+'" : ':'';
         rtext+=(' ').repeat(pad*espace)+''+k+estart+'\r\n';
@@ -681,18 +681,18 @@ this.parseJSON=function(obj,limit,space,pad){
         }
         rtext+=(' ').repeat(pad*espace)+''+eend+comma+'\r\n';
       }else if(typeof e==='string'||typeof e==='number'){
-        var k=typeof e==='number'?e.toString():'"'+e+'"';
+        let k=typeof e==='number'?e.toString():'"'+e+'"';
         i=start==='{'?'"'+i+'" : ':'';
         rtext+=(' ').repeat(pad*espace)+''+i+k+comma+'\r\n';
       }else if(typeof e==='boolean'){
-        var k=e===true?'true':'false';
+        let k=e===true?'true':'false';
         i=start==='{'?'"'+i+'" : ':'';
         rtext+=(' ').repeat(pad*espace)+''+i+k+comma+'\r\n';
       }else if(e===null){
         i=start==='{'?'"'+i+'" : ':'';
         rtext+=(' ').repeat(pad*espace)+''+i+'null'+comma+'\r\n';
       }else{
-        var k='"['+(typeof e)+']"';
+        let k='"['+(typeof e)+']"';
         i=start==='{'?'"'+i+'" : ':'';
         rtext+=(' ').repeat(pad*espace)+''+i+k+comma+'\r\n';
       }
@@ -735,22 +735,22 @@ this.stream=function(url,cb,er,dt,hd,ul,dl,mt,ud4){
   dl=typeof dl==='function'?dl:function(){};
   ud4=typeof ud4==='function'?ud4:function(){};
   /* prepare xhr --> xmlhttp */
-  var xmlhttp=false;
+  let xmlhttp=false;
   if(window.XMLHttpRequest){
     xmlhttp=new XMLHttpRequest();
   }else{
     /* older browser xhr */
-    var xhf=[
+    let xhf=[
       function(){return new ActiveXObject("Msxml2.XMLHTTP");},
       function(){return new ActiveXObject("Msxml3.XMLHTTP");},
       function(){return new ActiveXObject("Microsoft.XMLHTTP");}
     ];
-    for(var i=0;i<xhf.length;i++){try{xmlhttp=xhf[i]();}catch(e){continue;}break;}
+    for(let i=0;i<xhf.length;i++){try{xmlhttp=xhf[i]();}catch(e){continue;}break;}
   }
   /* check xhr */
   if(!xmlhttp){return er('Error: Failed to build XML http request.');}
   /* set method */
-  var mts=['GET','POST','PUT','OPTIONS','HEAD','DELETE'];
+  let mts=['GET','POST','PUT','OPTIONS','HEAD','DELETE'];
   mt=typeof mt==='string'&&mts.indexOf(mt)>=0?mt
     :typeof dt==='object'&&dt!==null?'POST':'GET';
   /* open xhr connection */
@@ -764,7 +764,7 @@ this.stream=function(url,cb,er,dt,hd,ul,dl,mt,ud4){
   }
   /* set headers */
   if(typeof hd=='object'&&hd!=null){
-    for(var i in hd){xmlhttp.setRequestHeader(i,hd[i]);}
+    for(let i in hd){xmlhttp.setRequestHeader(i,hd[i]);}
   }
   /* set callback for upload and download */
   xmlhttp.upload.addEventListener('progress',ul,false);
@@ -773,8 +773,9 @@ this.stream=function(url,cb,er,dt,hd,ul,dl,mt,ud4){
   xmlhttp.addEventListener('readystatechange',function(e){
     if(xmlhttp.readyState===4&&xmlhttp.status===200
       &&typeof xmlhttp.responseText==='string'){
-      try{var res=JSON.parse(xmlhttp.responseText);}
-      catch(e){var res=xmlhttp.responseText;}
+      let res=xmlhttp.responseText;
+      try{res=JSON.parse(xmlhttp.responseText);}
+      catch(e){res=xmlhttp.responseText;}
       return cb(res);
     }else if(xmlhttp.readyState===4){
       return er('Error: '+xmlhttp.status+' - '
@@ -799,7 +800,7 @@ this.onFunctionReady=function(fn,cb,cr){
   cb=typeof cb==='function'?cb:function(){};
   if(typeof fn!=='string'){return cb(false);}
   if(window.hasOwnProperty(fn)||cr>0x03){
-    var res=window.hasOwnProperty(fn)
+    let res=window.hasOwnProperty(fn)
       &&typeof window[fn]==='function'?true:false;
     return cb(res);
   }cr++;
@@ -817,8 +818,8 @@ this.virtualFile=function(f,c){
   r=/^force\/virtual\//,
   k=p+''+f.toString();
   if(f===false){
-    for(var i=0;i<localStorage.length;i++){
-      var v=localStorage.key(i);
+    for(let i=0;i<localStorage.length;i++){
+      let v=localStorage.key(i);
       if(v.match(r)){
         localStorage.removeItem(v);
       }
@@ -838,13 +839,13 @@ this.virtualFile=function(f,c){
  */
 this.isScriptLoaded=function(f){
   if(typeof f!=='string'){return false;}
-  var s=document.querySelector('script[id="'+f+'"]');
+  let s=document.querySelector('script[id="'+f+'"]');
   return s?true:false;
 };
 /* load script from file */
 this.loadScriptFile=function(f){
   if(typeof f!=='string'){return false;}
-  var j=document.createElement('script');
+  let j=document.createElement('script');
   j.type='text/javascript';
   j.async=true;
   j.id=f;
@@ -855,8 +856,8 @@ this.loadScriptFile=function(f){
 /* load script from string */
 this.loadScript=function(s,i){
   if(typeof s!=='string'){return;}
-  var id=i?i:Math.ceil((new Date).getTime()*Math.random());
-  var j=document.createElement('script');
+  let id=i?i:Math.ceil((new Date).getTime()*Math.random()),
+  j=document.createElement('script');
   j.type='text/javascript';
   j.async=true;
   j.id=id;
@@ -867,7 +868,7 @@ this.loadScript=function(s,i){
 /* load style from file */
 this.loadStyleFile=function(f){
   if(typeof f!=='string'){return false;}
-  var j=document.createElement('link');
+  let j=document.createElement('link');
   j.type='text/css';
   j.rel='stylesheet';
   j.media='screen,print';
@@ -880,8 +881,8 @@ this.loadStyleFile=function(f){
 /* load style from string */
 this.loadStyle=function(s,i){
   if(typeof s!=='string'){return;}
-  var id=i?i:Math.ceil((new Date).getTime()*Math.random());
-  var j=document.createElement('style');
+  let id=i?i:Math.ceil((new Date).getTime()*Math.random()),
+  j=document.createElement('style');
   j.id=id;
   j.type='text/css';
   j.rel='stylesheet';
@@ -893,7 +894,7 @@ this.loadStyle=function(s,i){
 /* load module from file */
 this.loadModuleFile=function(f){
   if(typeof f!=='string'){return false;}
-  var j=document.createElement('script');
+  let j=document.createElement('script');
   j.type='module';
   j.async=true;
   j.defer=true;
@@ -905,8 +906,8 @@ this.loadModuleFile=function(f){
 /* load module script from string */
 this.loadModule=function(s,i){
   if(typeof s!=='string'){return;}
-  var id=i?i:Math.ceil((new Date).getTime()*Math.random());
-  var j=document.createElement('script');
+  let id=i?i:Math.ceil((new Date).getTime()*Math.random()),
+  j=document.createElement('script');
   j.type='module';
   j.id=id;
   j.textContent=s;
@@ -917,14 +918,14 @@ this.loadModule=function(s,i){
 this.clearElement=function(el){
   if(typeof el!=='object'||el===null
     ||typeof el.removeChild!=='function'){return false;}
-  var i=el.childNodes.length;
+  let i=el.childNodes.length;
   while(i--){
     el.removeChild(el.childNodes[i]);
   }return true;
 };
 /* build element */
 this.buildElement=function(tag,text,attr,children,html,content){
-  var div=document.createElement(typeof tag==='string'?tag:'div');
+  let div=document.createElement(typeof tag==='string'?tag:'div');
   div.appendTo=function(el){
     if(typeof el==='object'&&el!==null
       &&typeof el.appendChild==='function'){
@@ -942,12 +943,12 @@ this.buildElement=function(tag,text,attr,children,html,content){
     div.innerText=text;
   }
   if(typeof attr==='object'&&attr!==null){
-    for(var i in attr){
+    for(let i in attr){
       div.setAttribute(i,attr[i]);
     }
   }
   if(Array.isArray(children)){
-    for(var i=0;i<children.length;i++){
+    for(let i=0;i<children.length;i++){
       if(typeof children[i]==='object'
         &&children[i]!==null
         &&typeof children[i].appendChild==='function'){
@@ -973,8 +974,8 @@ this.buildElement=function(tag,text,attr,children,html,content){
 };
 /* build url query -- build urlencoded form data */
 this.buildQuery=function(data,key){
-  var ret=[],dkey=null;
-  for(var d in data){
+  let ret=[],dkey=null;
+  for(let d in data){
     dkey=key?key+'['+encodeURIComponent(d)+']'
         :encodeURIComponent(d);
     if(typeof data[d]=='object'&&data[d]!==null){
@@ -984,43 +985,57 @@ this.buildQuery=function(data,key){
     }
   }return ret.join("&");
 };
-/* parse query string */
-this.parseQuery=function(t){
+/* parse url query */
+this.parseQuery=function(t,g='&',h='='){
   if(typeof t!=='string'){return false;}
-  var s=t.split('&');
-  var r={},c={};
-  for(var i=0;i<s.length;i++){
+  let s=t.split(g),r={},c={};
+  for(let i=0;i<s.length;i++){
     if(!s[i]||s[i]==''){continue;}
-    var p=s[i].split('=');
-    var k=decodeURIComponent(p[0]);
-    if(k.match(/\[(.*)?\]$/g)){
-      var l=k.replace(/\[(.*)?\]$/g,'');
-      var w=k.replace(/^.*\[(.*)?\]$/g,"$1");
-      c[l]=c[l]?c[l]:0;
-      if(w==''){w=c[l];c[l]+=1;}
-      if(!r[l]){r[l]={};}
-      r[l][w]=decodeURIComponent(p[1]);
+    let p=s[i].split(h),
+    k=decodeURIComponent(p[0]),
+    m=k.match(/(\[[^\]]*\])/g),
+    v=p[1]?decodeURIComponent(p[1]):'';
+    if(!m){
+      r[k]=v;
       continue;
-    }r[k]=p[1]?decodeURIComponent(p[1]):'';
+    }
+    let l=k.replace(/\[(.*)?\]$/g,'');
+    c[l]=c[l]?c[l]:0;
+    if(!r[l]){r[l]={};}
+    r[l]=this.parseQueryKey(r[l],m,v);
   }return r;
+};
+/* parse query key as object keys */
+this.parseQueryKey=function(obj,m,v,i){
+  obj=typeof obj==='object'&&obj!==null?obj:{};
+  i=i?parseInt(i,10):0;
+  if(!Array.isArray(m)||!m[i]){
+    return v;
+  }
+  let ml=m.length,
+  mi=m[i].replace(/^\[(.*)\]$/,'$1');
+  if(!obj[mi]){
+    obj[mi]={};
+  }
+  obj[mi]=this.parseQueryKey(obj[mi],m,v,i+1);
+  return obj;
 };
 /* object length */
 this.objectLength=function(obj){
   obj=typeof obj==='object'&&obj!==null?obj:{};
-  var size=0,key;
+  let size=0,key;
   for(key in obj){
     if(obj.hasOwnProperty(key)){size++;}
   }return size;
 };
 /* loading view - force-loader-191026 from force-loader-171229 */
 this.loader=function(text,info,value,max){
-  /* prepare loader id */
-  var id='force-loader-191026';
-  /* check loader elements */
-  var ld=document.getElementById(id);
-  var ct=document.getElementById(id+'-text');
-  var ci=document.getElementById(id+'-info');
-  var cp=document.getElementById(id+'-progress');
+  /* prepare loader id and check loader elements */
+  let id='force-loader-191026',
+  ld=document.getElementById(id),
+  ct=document.getElementById(id+'-text'),
+  ci=document.getElementById(id+'-info'),
+  cp=document.getElementById(id+'-progress');
   /* check text string */
   if(typeof text!=='string'){
     if(ld){ld.parentNode.removeChild(ld);}
@@ -1028,11 +1043,11 @@ this.loader=function(text,info,value,max){
   }
   if(!ld){
     /* create elements */
-    var ld=document.createElement('div');
-    var bg=document.createElement('div');
-    var lim=document.createElement('div');
-    var img=document.createElement('img');
-    var ct=document.createElement('div');
+    ld=document.createElement('div');
+    ct=document.createElement('div');
+    let bg=document.createElement('div'),
+    lim=document.createElement('div'),
+    img=document.createElement('img');
     /* add ids */
     ld.id=id;
     ct.id=id+'-text';
@@ -1056,7 +1071,7 @@ this.loader=function(text,info,value,max){
   /* add values */
   ct.innerText=text.replace(/\r|\n/g,' ');
   /* default output */
-  var out={
+  let out={
     text:ct,
     info:null,
     progress:null,
@@ -1064,7 +1079,7 @@ this.loader=function(text,info,value,max){
   /* check info string */
   if(typeof info==='string'){
     if(!ci){
-      var ci=document.createElement('div');
+      ci=document.createElement('div');
       ci.id=id+'-info';
       ci.classList.add('force-loader-info');
       ld.appendChild(ci);
@@ -1073,7 +1088,7 @@ this.loader=function(text,info,value,max){
     if(typeof value==='number'
       &&typeof max==='number'){
       if(!cp){
-        var cp=document.createElement('progress');
+        cp=document.createElement('progress');
         cp.id=id+'-progress';
         cp.classList.add('force-loader-progress');
         ci.classList.add('force-loader-info-with-progress');
@@ -1094,10 +1109,10 @@ this.loader=function(text,info,value,max){
 };
 /* create loader css for loader and splash */
 this.loaderCSS=function(){
-  var id='force-loader-css',
+  let id='force-loader-css',
   c=document.getElementById(id);
   if(c){return c;}
-  var s='.force-loader{position:fixed;width:0px;height:0px;top:50%;left:50%;z-index:10000;-webkit-user-select:none;-moz-user-select:none;user-select:none;font-family:arialnarrow,system-ui,monospace;}.force-loader-background{background-color:#fff;opacity:1;position:fixed;width:100%;height:100%;top:0px;left:0px;right:0px;bottom:0px;margin:0px;padding:0px;z-index:10001;}.force-loader-image{margin:-70px 0px 0px 0px;padding:0px;left:0px;width:100%;height:32px;line-height:32px;vertical-align:top;text-align:center;font-family:inherit,system-ui,monospace;color:#777;font-size:13px;z-index:10002;position:fixed;}.force-loader-image img{width:32px;height:32px;}.force-loader-text{margin:-35px 0px 0px 0px;padding:0px;left:0px;width:100%;height:50px;cursor:default;line-height:15px;vertical-align:top;text-align:center;position:fixed;font-family:inherit,system-ui,monospace;color:#777;font-size:13px;z-index:10002;}.force-loader-info{margin:-19px 0px 0px 0px;padding:0px;left:0px;width:100%;height:50px;cursor:default;line-height:15px;vertical-align:top;text-align:center;position:fixed;font-family:inherit,system-ui,monospace;color:#777;font-size:13px;z-index:10002;}.force-loader-info-with-progress{margin:-4px 0px 0px 0px;}.force-loader-progress{margin:-13px 0px 0px 0px;padding:0px;height:5px;border:0px none;border-radius:2px;width:calc(100% - 30px);background-color:#ddd;transition:all 0.1s ease 0s;cursor:default;position:fixed;z-index:10002;left:15px;}.force-loader-progress::-moz-progress-bar{background:#9d5;border-radius:2px;}.force-loader-progress::-webkit-progress-value{background:#9d5;border-radius:2px;}.force-loader-progress::-webkit-progress-bar{background:#ddd;border-radius:2px;}.force-splash{display:block;position:fixed;z-index:9999;top:7%;left:calc(15% - 20px);background-color:#000;color:#fff;opacity:0.5;padding:10px 20px;width:70%;max-width:70%;max-height:70%;text-align:center;border:0px none;border-radius:7px;transition:all 0.3s ease 0s;white-space:pre-wrap;overflow-x:hidden;overflow-y:auto;word-break:break-word;-moz-user-select:none;-webkit-user-select:none;user-select:none;font-size:13px;font-family:arialnarrow,system-ui,monospace;}';
+  let s='.force-loader{position:fixed;width:0px;height:0px;top:50%;left:50%;z-index:10000;-webkit-user-select:none;-moz-user-select:none;user-select:none;font-family:arialnarrow,system-ui,monospace;}.force-loader-background{background-color:#fff;opacity:1;position:fixed;width:100%;height:100%;top:0px;left:0px;right:0px;bottom:0px;margin:0px;padding:0px;z-index:10001;}.force-loader-image{margin:-70px 0px 0px 0px;padding:0px;left:0px;width:100%;height:32px;line-height:32px;vertical-align:top;text-align:center;font-family:inherit,system-ui,monospace;color:#777;font-size:13px;z-index:10002;position:fixed;}.force-loader-image img{width:32px;height:32px;}.force-loader-text{margin:-35px 0px 0px 0px;padding:0px;left:0px;width:100%;height:50px;cursor:default;line-height:15px;vertical-align:top;text-align:center;position:fixed;font-family:inherit,system-ui,monospace;color:#777;font-size:13px;z-index:10002;}.force-loader-info{margin:-19px 0px 0px 0px;padding:0px;left:0px;width:100%;height:50px;cursor:default;line-height:15px;vertical-align:top;text-align:center;position:fixed;font-family:inherit,system-ui,monospace;color:#777;font-size:13px;z-index:10002;}.force-loader-info-with-progress{margin:-4px 0px 0px 0px;}.force-loader-progress{margin:-13px 0px 0px 0px;padding:0px;height:5px;border:0px none;border-radius:2px;width:calc(100% - 30px);background-color:#ddd;transition:all 0.1s ease 0s;cursor:default;position:fixed;z-index:10002;left:15px;}.force-loader-progress::-moz-progress-bar{background:#9d5;border-radius:2px;}.force-loader-progress::-webkit-progress-value{background:#9d5;border-radius:2px;}.force-loader-progress::-webkit-progress-bar{background:#ddd;border-radius:2px;}.force-splash{display:block;position:fixed;z-index:9999;top:7%;left:calc(15% - 20px);background-color:#000;color:#fff;opacity:0.5;padding:10px 20px;width:70%;max-width:70%;max-height:70%;text-align:center;border:0px none;border-radius:7px;transition:all 0.3s ease 0s;white-space:pre-wrap;overflow-x:hidden;overflow-y:auto;word-break:break-word;-moz-user-select:none;-webkit-user-select:none;user-select:none;font-size:13px;font-family:arialnarrow,system-ui,monospace;}';
   c=document.createElement('style');
   c.rel='stylesheet';
   c.type='text/css';
@@ -1109,10 +1124,10 @@ this.loaderCSS=function(){
 };
 /* create dialog css for dialog */
 this.dialogCSS=function(){
-  var id='force-dialog-css',
+  let id='force-dialog-css',
   c=document.getElementById(id);
   if(c){return c;}
-  var s='.force-dialog{transition:all 0.3s ease 0s;width:270px;height:auto;max-height:270px;margin:0px;padding:0px;background-color:#fff;display:block;position:fixed;z-index:99999;top:-100vh;left:calc(50vw - 135px);box-shadow:0px 0px 15px #999;border:0px none;border-radius:10px;overflow:hidden;font-family:arialnarrow,system-ui,monospace;}.force-dialog-show{top:calc(50vh - 135px);}.force-dialog-background{transition:all 0.5s ease 0s;width:100vw;height:100vh;margin:0px;padding:0px;background-color:#fff;opacity:0.5;display:block;position:fixed;z-index:99998;top:0px;left:0px;right:0px;bottom:0px;border:0px none;overflow:hidden;}.force-dialog-title{font-weight:bold;font-size:20px;color:#555;border-bottom:1px solid #ddd;box-shadow:0px 1px 5px #ddd;margin:0px;padding:0px;text-align:center;height:50px;line-height:50px;overflow:hidden;white-space:pre-wrap;font-family:inherit,system-ui,monospace;}.force-dialog-title:before{content:attr(data-text);}.force-dialog-text-out{margin:0px;padding:20px 10px;overflow:hidden;}.force-dialog-text{font-size:16px;color:#555;margin:0px;padding:0px;overflow-x:hidden;overflow-y:auto;white-space:pre-wrap;word-wrap:pre-wrap;word-break:break-all;height:auto;max-height:113px;text-align:center;font-family:inherit,system-ui,monospace;}.force-dialog-text:before{content:attr(data-text);}.force-dialog-text-left{text-align:left;}.force-dialog-input{width:calc(100% - 20px);font-size:16px;border:1px solid #ddd;border-radius:5px;margin:10px 10px 10px;padding:7px 13px;color:#333;font-weight:normal;background-color:#eed;font-family:inherit,system-ui,monospace;}.force-dialog-button-out{border-top:1px solid #ddd;box-shadow:0px -1px 5px #ddd;margin:0px;padding:0px;text-align:center;height:65px;line-height:60px;overflow:hidden;}.force-dialog-button:focus{background-color:#ccb;outline:none;}.force-dialog-button:hover{background-color:#ddc;}.force-dialog-button:disabled{background-color:#ddc;color:#333;opacity:0.8;}.force-dialog-button:before{content:attr(data-text);}.force-dialog-button{background-color:#eed;padding:7px 13px;border:0px none;color:#333;font-size:16px;line-height:16px;margin:0px 0px;border-radius:3px;cursor:default;transition:all 0.3s ease 0s;box-shadow:1px 1px 3px #777;outline:none;font-weight:bold;font-family:inherit,system-ui,monospace;display:inline-block;cursor:default;}.force-dialog-button-left{margin-right:10px;}.force-dialog-button-blue:focus{background-color:#159;}.force-dialog-button-blue:hover{background-color:#26a;}.force-dialog-button-blue{color:#fff;background-color:#37b;}.force-dialog-button-soft-green:focus{background-color:#591;}.force-dialog-button-soft-green:hover{background-color:#6a2;}.force-dialog-button-soft-green{color:#fff;background-color:#7b3;}.force-dialog-button-orange:focus{background-color:#951;}.force-dialog-button-orange:hover{background-color:#a62;}.force-dialog-button-orange{color:#fff;background-color:#b73;}.force-dialog-button-red:focus{background-color:#a11;}.force-dialog-button-red:hover{background-color:#b22;}.force-dialog-button-red{color:#fff;background-color:#c33;}.force-dialog-button-yellow:focus{background-color:#aa1;}.force-dialog-button-yellow:hover{background-color:#bb2;}.force-dialog-button-yellow{color:#fff;background-color:#cc3;}.force-dialog-button-purple:focus{background-color:#519;}.force-dialog-button-purple:hover{background-color:#62a;}.force-dialog-button-purple{color:#fff;background-color:#73b;}.force-dialog-button-pink:focus{background-color:#915;}.force-dialog-button-pink:hover{background-color:#a26;}.force-dialog-button-pink{color:#fff;background-color:#b37;}.force-dialog-button-tosca:focus{background-color:#195;}.force-dialog-button-tosca:hover{background-color:#2a6;}.force-dialog-button-tosca{color:#fff;background-color:#3b7;}.force-dialog-button-violet:focus{background-color:#a1a;}.force-dialog-button-violet:hover{background-color:#b2b;}.force-dialog-button-violet{color:#fff;background-color:#c3c;}.force-dialog-button-light-blue:focus{background-color:#1aa;}.force-dialog-button-light-blue:hover{background-color:#2bb;}.force-dialog-button-light-blue{color:#fff;background-color:#3cc;}.force-dialog-button-dark-blue:focus{background-color:#11a;}.force-dialog-button-dark-blue:hover{background-color:#22b;}.force-dialog-button-dark-blue{color:#fff;background-color:#33c;}.force-dialog-button-green:focus{background-color:#1a1;}.force-dialog-button-green:hover{background-color:#2b2;}.force-dialog-button-green{color:#fff;background-color:#3c3;}';
+  let s='.force-dialog{transition:all 0.3s ease 0s;width:270px;height:auto;max-height:270px;margin:0px;padding:0px;background-color:#fff;display:block;position:fixed;z-index:99999;top:-100vh;left:calc(50vw - 135px);box-shadow:0px 0px 15px #999;border:0px none;border-radius:10px;overflow:hidden;font-family:arialnarrow,system-ui,monospace;}.force-dialog-show{top:calc(50vh - 135px);}.force-dialog-background{transition:all 0.5s ease 0s;width:100vw;height:100vh;margin:0px;padding:0px;background-color:#fff;opacity:0.5;display:block;position:fixed;z-index:99998;top:0px;left:0px;right:0px;bottom:0px;border:0px none;overflow:hidden;}.force-dialog-title{font-weight:bold;font-size:20px;color:#555;border-bottom:1px solid #ddd;box-shadow:0px 1px 5px #ddd;margin:0px;padding:0px;text-align:center;height:50px;line-height:50px;overflow:hidden;white-space:pre-wrap;font-family:inherit,system-ui,monospace;}.force-dialog-title:before{content:attr(data-text);}.force-dialog-text-out{margin:0px;padding:20px 10px;overflow:hidden;}.force-dialog-text{font-size:16px;color:#555;margin:0px;padding:0px;overflow-x:hidden;overflow-y:auto;white-space:pre-wrap;word-wrap:pre-wrap;word-break:break-all;height:auto;max-height:113px;text-align:center;font-family:inherit,system-ui,monospace;}.force-dialog-text:before{content:attr(data-text);}.force-dialog-text-left{text-align:left;}.force-dialog-input{width:calc(100% - 20px);font-size:16px;border:1px solid #ddd;border-radius:5px;margin:10px 10px 10px;padding:7px 13px;color:#333;font-weight:normal;background-color:#eed;font-family:inherit,system-ui,monospace;}.force-dialog-button-out{border-top:1px solid #ddd;box-shadow:0px -1px 5px #ddd;margin:0px;padding:0px;text-align:center;height:65px;line-height:60px;overflow:hidden;}.force-dialog-button:focus{background-color:#ccb;outline:none;}.force-dialog-button:hover{background-color:#ddc;}.force-dialog-button:disabled{background-color:#ddc;color:#333;opacity:0.8;}.force-dialog-button:before{content:attr(data-text);}.force-dialog-button{background-color:#eed;padding:7px 13px;border:0px none;color:#333;font-size:16px;line-height:16px;margin:0px 0px;border-radius:3px;cursor:default;transition:all 0.3s ease 0s;box-shadow:1px 1px 3px #777;outline:none;font-weight:bold;font-family:inherit,system-ui,monospace;display:inline-block;cursor:default;}.force-dialog-button-left{margin-right:10px;}.force-dialog-button-blue:focus{background-color:#159;}.force-dialog-button-blue:hover{background-color:#26a;}.force-dialog-button-blue{color:#fff;background-color:#37b;}.force-dialog-button-soft-green:focus{background-color:#591;}.force-dialog-button-soft-green:hover{background-color:#6a2;}.force-dialog-button-soft-green{color:#fff;background-color:#7b3;}.force-dialog-button-orange:focus{background-color:#951;}.force-dialog-button-orange:hover{background-color:#a62;}.force-dialog-button-orange{color:#fff;background-color:#b73;}.force-dialog-button-red:focus{background-color:#a11;}.force-dialog-button-red:hover{background-color:#b22;}.force-dialog-button-red{color:#fff;background-color:#c33;}.force-dialog-button-yellow:focus{background-color:#aa1;}.force-dialog-button-yellow:hover{background-color:#bb2;}.force-dialog-button-yellow{color:#fff;background-color:#cc3;}.force-dialog-button-purple:focus{background-color:#519;}.force-dialog-button-purple:hover{background-color:#62a;}.force-dialog-button-purple{color:#fff;background-color:#73b;}.force-dialog-button-pink:focus{background-color:#915;}.force-dialog-button-pink:hover{background-color:#a26;}.force-dialog-button-pink{color:#fff;background-color:#b37;}.force-dialog-button-tosca:focus{background-color:#195;}.force-dialog-button-tosca:hover{background-color:#2a6;}.force-dialog-button-tosca{color:#fff;background-color:#3b7;}.force-dialog-button-violet:focus{background-color:#a1a;}.force-dialog-button-violet:hover{background-color:#b2b;}.force-dialog-button-violet{color:#fff;background-color:#c3c;}.force-dialog-button-light-blue:focus{background-color:#1aa;}.force-dialog-button-light-blue:hover{background-color:#2bb;}.force-dialog-button-light-blue{color:#fff;background-color:#3cc;}.force-dialog-button-dark-blue:focus{background-color:#11a;}.force-dialog-button-dark-blue:hover{background-color:#22b;}.force-dialog-button-dark-blue{color:#fff;background-color:#33c;}.force-dialog-button-green:focus{background-color:#1a1;}.force-dialog-button-green:hover{background-color:#2b2;}.force-dialog-button-green{color:#fff;background-color:#3c3;}';
   c=document.createElement('style');
   c.rel='stylesheet';
   c.type='text/css';
@@ -1128,7 +1143,7 @@ this.fontCSS=function(){
 };
 /* prevent context menu */
 this.absorbEvent=function(event){
-  var e=event||window.event;
+  let e=event||window.event;
   e.preventDefault&&e.preventDefault();
   e.stopPropagation&&e.stopPropagation();
   e.cancelBubble=true;
