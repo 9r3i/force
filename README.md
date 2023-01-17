@@ -250,5 +250,9 @@ This property is special, object plugin to help loaded app fulfill its goal.
 # Closing
 That's all there is to it. Alhamdulillaah...
 
+### Visitors
+[![9r3i/force Visitors](https://9r3i.web.id/api/views/?user=9r3i-force&color=51,119,187)](https://github.com/9r3i/force)
+|---|
+| Since January 18th 2023 |
 
 
